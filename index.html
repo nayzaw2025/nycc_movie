@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Link Extractor</title>
+  <style>
+    body { background: #0f0f1e; color: #fff; font-family: sans-serif; padding: 20px; }
+    .container { max-width: 600px; margin: auto; }
+    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
+    button { width: 100%; padding: 12px; background: #667eea; border: none; color: white; border-radius: 8px; cursor: pointer; }
+    .card { background: #1a1a2e; padding: 15px; margin: 10px 0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Movie Link Extractor</h1>
+    <input type="text" id="url" placeholder="Paste HomieTV/YSFlix URL">
+    <button onclick="fetchLinks()">Extract</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function fetchLinks() {
+      const url = document.getElementById('url').value;
+      const resDiv = document.getElementById('result');
+      resDiv.innerHTML = "Fetching...";
+      
+      try {
+        // သင့်ရဲ့ Vercel API ကို လှမ်းခေါ်ခြင်း
+        const response = await fetch(`/api?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        
+        if (data.error) throw new Error(data.error);
+        
+        let html = `<h3>${data.data.title}</h3>`;
+        data.data.movie_download_links.forEach(link => {
+          html += `<div class="card">
+                     <strong>${link.server_name}</strong><br>
+                     <a href="${link.url}" target="_blank">Download Link</a>
+                   </div>`;
+        });
+        resDiv.innerHTML = html;
+      } catch (err) {
+        resDiv.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
